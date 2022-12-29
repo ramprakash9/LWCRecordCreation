@@ -1,0 +1,178 @@
+<template>
+    <lightning-spinner if:true={isLoading} alternative-text="Loading"></lightning-spinner>
+    <div>
+        <div class="oppCreate">
+            <h1 class="header"> Create Opportunity</h1>
+            <p>You must enter data in accordance with your local laws and contractual obligations.</p>
+
+        </div>     
+        <!-- <div class="basicInfo"> -->
+            <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                <div class="basicInfo">
+                    <lightning-accordion-section name="sectionOne" label="Basic Information">
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Account Name" required="" class="slds-col slds-size_1-of-2" placeholder="Enter the Account Name"></lightning-input>
+                            <lightning-input label="English Account Name" value ={rec.Name} onchange={handelNamechange}  required class="slds-col slds-size_1-of-2"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Opportunity Name" required="" class="slds-col slds-size_1-of-2" placeholder="Enter the Account Name"></lightning-input>
+                            <lightning-input label="Opportunity Description" value class="slds-col slds-size_1-of-2"></lightning-input>
+                        </div>
+                    
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Opportunity Leader" required class="slds-col slds-size_1-of-2"></lightning-input>
+                            <lightning-input label="Opportunity Geography" required class="slds-col slds-size_1-of-2"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <template if:true={stageOptions}>
+                                <lightning-combobox label="Stage" required="" class="slds-col slds-size_1-of-2" value={value} options={stageOptions} onchange={handleChange} placeholder=""></lightning-combobox>
+                            </template>
+                            <lightning-input label="Opportunity Type" required class="slds-col slds-size_1-of-2"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Probability (%)" value ={rec.Probability} onchange={handelProblchange} required placeholder="0" class="slds-col slds-size_1-of-2"></lightning-input>
+                            <lightning-input-field label="Probability (%)" value ={rec.Probability} onchange={handelProblchange} required placeholder="0" class="slds-col slds-size_2-of-2"></lightning-input-field>
+                            <lightning-input label="Source of Opportunity" required class="slds-col slds-size_2-of-2"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Source of Opportunity" required class="slds-col slds-size_1-of-2"></lightning-input>
+                            <lightning-input-field label="Source of Opportunity" required class="slds-col slds-size_2-of-2"></lightning-input-field>    
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="IMO/SGO" class="slds-col slds-size_1-of-2" value></lightning-input>
+                            <lightning-radio-group name="radioGroup" class="slds-size_1-of-2"
+                          label="Recurring"
+                          options={recurring}
+                          value={value}
+                          variant="label-stacked"
+                          style="display:block"
+                          type="radio"></lightning-radio-group>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-radio-group name="radioGroup" class="slds-size_1-of-2"
+                          label="Is this a Parent Framework Agreement?"
+                          options={parentFramework}
+                          value={value}
+                          variant="label-stacked"
+                          style="display:block"
+                          type="radio"></lightning-radio-group>
+                          <lightning-radio-group name="radioGroup" class="slds-size_1-of-2"
+                          label="Is this a Child Framework Agreement?"
+                          options={childFramework}
+                          value={value}
+                          variant="label-stacked"
+                          style="display:block"
+                          type="radio"></lightning-radio-group>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-radio-group name="radioGroup" class="slds-size_1-of-2"
+                          label="Will there be a RFP Process?"
+                          options={rfpProcess}
+                          value={value}
+                          variant="label-stacked"
+                          style="display:block"
+                          type="radio"></lightning-radio-group>
+                          <lightning-radio-group name="radioGroup" class="slds-size_1-of-2"
+                          label="Orals Anticipated?"
+                          options={oralsAnticipation}
+                          value={value}
+                          variant="abel-inline"
+                          style="display:block"
+                          type="radio"></lightning-radio-group>
+                        </div>
+                    </lightning-accordion-section>
+                </div>
+            </lightning-accordion>
+            <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                <div class="accessRights">
+                    <lightning-accordion-section name="sectionTwo" label="access Rights and Delivery Model">
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Access Type" class="slds-col slds-size_1-of-2"></lightning-input>
+                            <lightning-input label="Alternative Delivery Model(s) Used" class="slds-col slds-size_1-of-2" variant="label-stacked" type="checkbox"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Are Assets Involved?" class="slds-col slds-size_1-of-2"></lightning-input>
+                            <lightning-input label="Are Alliances/Tech Vendors Involved?" class="slds-col slds-size_1-of-2"></lightning-input>
+                        </div>
+                    </lightning-accordion-section>
+                </div>
+            </lightning-accordion>
+            <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                <div class="finacialInfo">
+                    <lightning-accordion-section name="sectionThree" label="Finacial Information">
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Total Global Opportunity Amount (Contracting Currency)" class="slds-col slds-size_1-of-2" required="Required"></lightning-input>
+                            <lightning-input label="Contracting Currency" class="slds-col slds-size_1-of-2" required="Required"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Total Global Opportunity Amount (USD)" class="slds-col slds-size_1-of-2" required=""></lightning-input>
+                            <lightning-input label="Gross Margin" class="slds-col slds-size_1-of-2" value={rec.Profitability__c} onchange={handelOppProfchange} required=""></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Billing Agreement" class="slds-col slds-size_1-of-2" required=""></lightning-input>
+                        </div>
+                    </lightning-accordion-section>
+                </div>
+            </lightning-accordion>
+            <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                <div class="importantDate">
+                    <lightning-accordion-section name="sectionFour" label="Important Date">
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Opportunity Start Date" class="slds-col slds-size_1-of-2" value={rec.gCRM_Pursuit_Start_Date__c} onchange={handelOppPersuitStartchange} type="date"></lightning-input>
+                            <lightning-input label="Expected Close Date" class="slds-col slds-size_1-of-2" required="Required" value={rec.CloseDate} onchange={handelOppCLoseDatechange} type="date"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Project Start Date" value={rec.gCRM_Engagement_Start__c} onchange={handelOppEngmtStartDatechange} type="date" class="slds-col slds-size_1-of-2"></lightning-input>
+                            <lightning-input label="Project End Date" value={rec.gCRM_Engagement_End__c} onchange={handelOppEngmtEndDatechange} type="date" class="slds-col slds-size_1-of-2"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Proposal Due Date" value={rec.gCRM_Proposal_Submission_Date__c} onchange={handelOppPropSubmissionDatechange} type="date" class="slds-col slds-size_1-of-2" required=""></lightning-input>
+                        </div>
+                    </lightning-accordion-section>
+                </div>
+            </lightning-accordion>
+            <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
+                <div class="billingData">
+                    <lightning-accordion-section name="sectionFive" label="Billing Data">
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Billing Arrangement" class="slds-col slds-size_1-of-2"  value ={rec.gCRM_Billing_Arrangement__c} onchange={handelOppBillingArrgmtchange} required=""></lightning-input>
+                            <lightning-input label="Source of Opportunity" class="slds-col slds-size_1-of-2" value ={rec.gCRM_Source_of_Opportunity__c} onchange={handelOppSourcechange} required="Required"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Deloitte Bid Position (US)" value ={rec.gCRM_Deloitte_Bid_Position__c} onchange={handelOppBidPostchange} class="slds-col slds-size_1-of-2"></lightning-input>
+                            <lightning-input label="Solicitation Number (US)"  value ={rec.gCRM_Solicitation_Number__c} onchange={handelSolNumchange} class="slds-col slds-size_1-of-2"></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Access Type" class="slds-col slds-size_1-of-2" required=""></lightning-input>
+                            <lightning-input label="Deloite GovWin # (US)" value ={rec.gCRM_Deloitte_GovWin__c} onchange={handelOppGowinchange} class="slds-col slds-size_1-of-2" required=""></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Covid19 Related Opportunity?" class="slds-col slds-size_1-of-2" required=""></lightning-input>
+                            <lightning-input label="Opportunity Notes (US)" value ={rec.gCRM_Opportunity_Notes__c} onchange={handelOppNotchange}  class="slds-col slds-size_1-of-2" required=""></lightning-input>
+                        </div>
+                        <div class="slds-grid slds-p-bottom_small slds-gutters slds-var-p-around_xx-small">
+                            <lightning-input label="Office Location"  class="slds-col slds-size_1-of-2" required=""></lightning-input>
+                        </div>
+                    </lightning-accordion-section>
+                    <!-- <lightning-accordion-section allow-multiple-sections-open="" label="Win/Loss Assessment">
+
+                    </lightning-accordion-section> -->
+                </div>
+            </lightning-accordion>
+            
+            <lightning-accordion allow-multiple-sections-open>
+                <div class="relatedInfo">
+                <lightning-accordion-section allow-multiple-sections-open label="Related Information">
+
+                </lightning-accordion-section>
+            </div>
+            </lightning-accordion>
+
+            <div class="button">
+                <lightning-button label="Cancel" class="slds-float_left"></lightning-button>
+                <lightning-button label="Next" onclick ={navigateToOppQualf} class="slds-float_right"></lightning-button>
+            </div>
+
+        <!-- </div> -->
+    </div>
+</template>
