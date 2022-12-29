@@ -1,0 +1,331 @@
+import { LightningElement, api, wire,track} from 'lwc';
+import { NavigationMixin,CurrentPageReference  } from 'lightning/navigation';
+import createOpportunity from '@salesforce/apex/gAS_OpportunityCreationController.createOpportunity';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import retrieveActionItems from '@salesforce/apex/GCRM_CPEMNotificationCampController.retrieveActionItems';
+import getPickListValuesIntoList from '@salesforce/apex/gAS_OpportunityCreationController.getPickListValuesIntoList';
+
+
+export default class NavigationServiceLWC extends NavigationMixin(LightningElement) {
+    activeSections = ['sectionOne', 'sectionTwo', 'sectionThree', 'sectionFour', 'sectionFive'];
+    @api recordId
+    @api isLoading = false;
+    @api opportrecdId;
+    @api recdVal;
+     name ;
+     probl ;
+     solNum ;
+     oppNote ;
+     oppDescrp ;
+     oppProfbly ;
+     oppStrtDate ;
+     oppExcpClsDate ;
+     oppProjStrtDate ;
+     oppProjEndDate ;
+     oppPropDueDate ;
+     oppBillingArgmt ;
+     oppSourceFld ;
+     oppBidPosition ;
+     oppDelGodwinFld ;
+     radioValues = '';
+
+    data = [];
+    stageOptions;
+    
+    
+    rec = {
+        Name :  this.name ,
+        Probability : this.probl,
+        gCRM_Solicitation_Number__c : this.solNum,
+        gCRM_Opportunity_Notes__c : this.oppNote ,       
+        Description : this.oppDescrp ,        
+        Profitability__c : this.oppProfbly ,        
+        gCRM_Pursuit_Start_Date__c : this.oppStrtDate,        
+        gCRM_Engagement_Start__c : this.oppProjStrtDate,     
+        gCRM_Engagement_End__c : this.oppProjEndDate,        
+        gCRM_Proposal_Submission_Date__c : this.oppPropDueDate
+         /*  
+        gCRM_Source_of_Opportunity__c : 'Referral - External',
+        gCRM_Billing_Arrangement__c : 'Fixed Fee'
+       
+          
+        gCRM_Deloitte_Bid_Position__c : this.oppBidPosition,
+        gCRM_Deloitte_GovWin__c : this.oppDelGodwinFld
+        CloseDate : this.oppExcpClsDate              
+        */        
+    }
+
+    urlId = null;
+    urlLanguage = null;
+    urlType = null;
+    
+
+    @wire(CurrentPageReference)
+    getStateParameters(currentPageReference) {
+       if (currentPageReference) {
+          this.urlId = currentPageReference.state?.id;
+          this.urlLanguage = currentPageReference.state?.lang;
+       //   this.urlType = currentPageReference.state?.type;
+       }
+       console.log('-sasa-'+this.urlId);
+    }
+    
+    genericOnChange(event){
+        this[event.target.name] = event.target.value;
+    }
+    handelNamechange(event){
+        this.rec.Name = event.target.value;
+        console.log("name1", this.rec.Name);
+    }
+    handelProblchange(event){
+        this.rec.Probability = event.target.value;
+        console.log("ProblRcd", this.rec.Probability);
+    }
+    handelSolNumchange(event){
+        this.rec.gCRM_Solicitation_Number__c = event.target.value;
+        console.log("SolNumFld", this.rec.gCRM_Solicitation_Number__c);
+    }
+    handelOppNotchange(event){
+        this.rec.gCRM_Opportunity_Notes__c = event.target.value;
+        console.log("OppNote", this.rec.gCRM_Opportunity_Notes__c);    
+    }
+    handelOppDescrpchange(event){
+        this.rec.Description = event.target.value;
+        console.log("descp", this.rec.Description);    
+    }
+    handelOppProfchange(event){
+        this.rec.Profitability__c = event.target.value;
+        console.log("profi", this.rec.Profitability__c);    
+    }
+    handelOppPersuitStartchange(event){
+        this.rec.gCRM_Pursuit_Start_Date__c = event.target.value;
+        console.log("StartDate", this.rec.gCRM_Pursuit_Start_Date__c);    
+    }    
+    handelOppCLoseDatechange(event){
+        this.rec.CloseDate = event.target.value;
+        console.log("closeD", this.rec.CloseDate);    
+    }
+    handelOppEngmtStartDatechange(event){
+        this.rec.gCRM_Engagement_Start__c = event.target.value;
+        console.log("EgmtStart", this.rec.gCRM_Engagement_Start__c);    
+    }
+    handelOppEngmtEndDatechange(event){
+        this.rec.gCRM_Engagement_End__c = event.target.value;
+        console.log("ENdEngDate", this.rec.gCRM_Engagement_End__c);    
+    }
+    handelOppPropSubmissionDatechange(event){
+        this.rec.gCRM_Proposal_Submission_Date__c = event.target.value;
+        console.log("PropSumDate", this.rec.gCRM_Proposal_Submission_Date__c);    
+    }
+    handelOppBillingArrgmtchange(event){
+        this.rec.gCRM_Billing_Arrangement__c = event.target.value;
+        console.log("PropSumDate", this.rec.gCRM_Billing_Arrangement__c);    
+    }       
+    handelOppSourcechange(event){
+        this.rec.gCRM_Source_of_Opportunity__c = event.target.value;
+        console.log("PropSumDate", this.rec.gCRM_Source_of_Opportunity__c);    
+    }      
+    handelOppBidPostchange(event){
+        this.rec.gCRM_Deloitte_Bid_Position__c = event.target.value;
+        console.log("BidPosition", this.rec.gCRM_Deloitte_Bid_Position__c);    
+    }  
+    
+    handelOppGowinchange(event){
+        this.rec.gCRM_Deloitte_GovWin__c = event.target.value;
+        console.log("Gowin", this.rec.gCRM_Deloitte_GovWin__c);    
+    }  
+    navigateToNewRecordPage() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__objectPage',
+            attributes: {
+                objectApiName: 'Account',
+                actionName: 'new'
+            },
+        });
+    }
+    
+    // Navigate to Edit Record Page
+    navigateToEditRecordPage() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: this.recordId,
+                objectApiName: "Account",
+                actionName: "edit"
+            },
+        });
+    }
+
+    // Navigate to view Record Page
+    navigateToViewRecordPage() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: this.recordId,
+                objectApiName: "Account",
+                actionName: "view"
+            },
+        });
+    }
+    // Navigation to contant object home page
+    navigateConObject() {
+        this[NavigationMixin.Navigate]({
+            type: "standard__objectPage",
+            attributes: {
+                objectApiName: "Contact",
+                actionName: "home"
+            }
+        });
+    }
+
+    // Navigation to lightning component
+    /*If you are navigating to Lightning Component from LWC 
+    you need to implement the lightning:isUrlAddressable 
+    interface in your Lightning Component.*/
+    navigateToComponent() {
+        this[NavigationMixin.Navigate]({
+            type: "standard__component",
+            attributes: {
+                componentName: "c__gAS_StartAccountPlanning"    
+            }
+        });
+    }
+
+
+    naviagateToNewRecordWithDefaultValue(){
+       this[NavigationMixin.Navigate]({
+        type: 'standard__objectPage',
+        attributes: {
+            objectApiName: 'Contact',
+            actionName: 'new'
+        },
+        state: {
+            nooverride: "1",
+            defaultFieldValues:"FirstName= SFDC, LastName=Egal",
+        }
+    });
+}
+
+navigateToOppQualf(){
+        console.log('-s-');
+    //    console.log('urlType'+urlType);
+        this.isLoading=true;
+        console.log('-rec-'+JSON.stringify(this.rec));
+        createOpportunity({opp : this.rec}).then(result => {
+            this.isLoading = false;
+           
+            this.opportrecdId = result.Id;
+            console.log('-opportrecdId-'+result.Id);
+            console.log('opportunity created with id: ', result);
+
+            let componentDef = {
+                componentDef: "c:gAS_opportunitySplitCreation",
+                attributes: {
+                    label: 'Navigated From Another LWC Without Using Aura'                        
+                },
+                state: {
+                    c__recId: this.opportrecdId 
+                }
+            };
+
+                    // Encode the componentDefinition JS object to Base64 format to make it url addressable
+        let encodedComponentDef = btoa(JSON.stringify(componentDef));
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+                url: '/one/one.app#' + encodedComponentDef 
+                
+            }
+        });  
+        })
+        .catch(error => {
+            console.log('error123', JSON.stringify(error));
+            this.isLoading = false;
+        });       
+
+
+    }
+
+        //JO
+        get recurring() {
+            return [
+                { label: 'Yes', value: 'option1' },
+                { label: 'No', value: 'option2' },
+            ];
+        }
+
+        get parentFramework() {
+            return [
+                { label: 'Yes', value: 'option1' },
+                { label: 'No', value: 'option2' },
+            ];
+        }
+
+        get childFramework() {
+            return [
+                { label: 'Yes', value: 'option1' },
+                { label: 'No', value: 'option2' },
+            ];
+        }
+
+        get rfpProcess() {
+            return [
+                { label: 'Yes', value: 'option1' },
+                { label: 'No', value: 'option2' },
+            ];
+        }
+
+        get oralsAnticipation() {
+            return [
+                { label: 'Yes', value: 'option1' },
+                { label: 'No', value: 'option2' },
+            ];
+        }
+
+    handleChange(event) {
+        this.value = event.detail.value;
+        value = 'Qualified';
+    }
+
+    // connectedCallback(){
+    //     this.getPickListValues();
+        
+    // }
+
+    // getPickListValues() {
+    //     getPickListValuesIntoList()
+    //     .then((result) => {
+    //         console.log('result: ' + JSON.stringify(result));
+    //         let items = [];
+    //         for(let i = 0; i < result.length; i++) {
+    //             let obj = {label : result[i], value : result[i]}
+    //             items.push(obj);
+    //         }
+    //         console.log('items: ' + JSON.stringify(items));
+    //         this.stageOptions = items;
+    //     })
+    //     .catch((error) => {
+    //         console.log(error);
+    //     });
+    // }
+
+    @wire(getPickListValuesIntoList)
+	getStagePicklistValues({data, error}){
+        if(data){
+            console.log("Data is" + JSON.stringify(data));
+            let items = [];
+            for(let i = 0; i < data.length; i++) {
+                let obj = {label : data[i], value : data[i]}
+                items.push(obj);
+            }
+            console.log('items: ' + JSON.stringify(items));
+            this.stageOptions = items;
+            //this.stageOptions = data;
+            
+        }else if(error){
+            console.log(error);
+        }
+
+    }
+
+}
